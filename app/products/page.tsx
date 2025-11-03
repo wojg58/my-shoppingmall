@@ -1,52 +1,40 @@
 import { Suspense } from "react";
 import { ProductsList } from "@/components/products-list";
-import { PopularProducts } from "@/components/popular-products";
 import { ProductCardSkeleton } from "@/components/product-card-skeleton";
 import { CategoryFilter } from "@/components/category-filter";
+import { ProductsSort } from "@/components/products-sort";
+import { ProductsSearch } from "@/components/products-search";
 import { AlertCircle } from "lucide-react";
 
 /**
- * @file app/page.tsx
- * @description 홈페이지 - 상품 목록 표시
+ * @file app/products/page.tsx
+ * @description 상품 목록 페이지 - 전체 상품 조회 및 필터링
  *
- * 쇼핑몰 홈페이지로, 활성화된 상품 목록을 표시합니다.
+ * 모든 활성화된 상품을 조회하고 필터링/정렬할 수 있는 전용 페이지입니다.
  *
  * 주요 기능:
  * 1. Suspense를 활용한 로딩 상태 처리
- * 2. 인기 상품 섹션 (최신순 상품 중 8개)
- * 3. Supabase에서 활성화된 상품 데이터 페칭 (최신순, 최대 12개)
- * 4. 카테고리별 필터링 기능 (URL 쿼리 파라미터 기반)
+ * 2. Supabase에서 활성화된 상품 데이터 페칭 (정렬 옵션 지원)
+ * 3. 카테고리별 필터링 기능 (URL 쿼리 파라미터 기반)
+ * 4. 정렬 기능 (최신순, 가격 낮은순, 가격 높은순, 인기순)
  * 5. 반응형 그리드 레이아웃으로 상품 카드 표시
  * 6. 에러/빈 상태 처리
  *
  * @dependencies
- * - @/components/popular-products: 인기 상품 목록 데이터 페칭 컴포넌트
  * - @/components/products-list: 상품 목록 데이터 페칭 컴포넌트
  * - @/components/category-filter: 카테고리 필터 버튼 컴포넌트
+ * - @/components/products-sort: 정렬 옵션 버튼 컴포넌트
  * - @/components/product-card-skeleton: 로딩 스켈레톤 컴포넌트
  */
 
 /**
- * 로딩 폴백 컴포넌트 (스켈레톤 로더) - 전체 상품용
+ * 로딩 폴백 컴포넌트 (스켈레톤 로더) - 상품 목록 페이지용
  */
 function ProductsLoading() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {Array.from({ length: 8 }).map((_, index) => (
+      {Array.from({ length: 20 }).map((_, index) => (
         <ProductCardSkeleton key={`skeleton-${index}`} />
-      ))}
-    </div>
-  );
-}
-
-/**
- * 로딩 폴백 컴포넌트 (스켈레톤 로더) - 인기 상품용 (8개)
- */
-function PopularProductsLoading() {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {Array.from({ length: 8 }).map((_, index) => (
-        <ProductCardSkeleton key={`popular-skeleton-${index}`} />
       ))}
     </div>
   );
@@ -67,14 +55,35 @@ function ProductsError({ error }: { error: string }) {
   );
 }
 
-interface HomeProps {
-  searchParams: Promise<{ category?: string }>;
+interface ProductsPageProps {
+  searchParams: Promise<{
+    category?: string;
+    sort?: string;
+    page?: string;
+    search?: string;
+  }>;
 }
 
-export default async function Home(props: HomeProps) {
+export default async function ProductsPage(props: ProductsPageProps) {
   // Next.js 15: searchParams를 async로 처리
   const searchParams = await props.searchParams;
   const category = searchParams.category || null;
+  const sort = searchParams.sort || null;
+  const pageParam = searchParams.page || null;
+  const search = searchParams.search || null;
+
+  // 페이지 번호 파싱 (1부터 시작, 기본값: 1)
+  const page = pageParam ? parseInt(pageParam, 10) : 1;
+  const validPage = page > 0 ? page : 1;
+
+  console.group("📦 상품 목록 페이지 렌더링");
+  console.log("URL 쿼리 파라미터:", {
+    category,
+    sort,
+    page: validPage,
+    search,
+  });
+  console.groupEnd();
 
   // 환경변수 확인 (에러 발생 시 즉시 처리)
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -104,32 +113,35 @@ export default async function Home(props: HomeProps) {
         {/* 페이지 헤더 */}
         <div className="mb-8 lg:mb-12">
           <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            쇼핑몰에 오신 것을 환영합니다
+            전체 상품
           </h1>
           <p className="text-lg lg:text-xl text-gray-600 dark:text-gray-400">
             다양한 상품을 둘러보고 마음에 드는 상품을 찾아보세요
           </p>
         </div>
 
-        {/* 인기 상품 섹션 */}
-        <section className="mb-12 lg:mb-16">
-          <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">
-            🔥 인기 상품
-          </h2>
-          <Suspense fallback={<PopularProductsLoading />}>
-            <PopularProducts />
-          </Suspense>
-        </section>
-
-        {/* 전체 상품 제목 */}
-        <h1 className="text-3xl font-bold mb-8">전체 상품</h1>
-
         {/* 카테고리 필터 */}
         <CategoryFilter />
 
+        {/* 검색 */}
+        <ProductsSearch />
+
+        {/* 정렬 옵션 */}
+        <ProductsSort />
+
         {/* 상품 목록 (Suspense로 로딩 상태 처리) */}
-        <Suspense fallback={<ProductsLoading />} key={category || "all"}>
-          <ProductsList category={category} limit={12} />
+        <Suspense
+          fallback={<ProductsLoading />}
+          key={`${category || "all"}-${sort || "newest"}-${
+            search || ""
+          }-${validPage}`}
+        >
+          <ProductsList
+            category={category}
+            page={validPage}
+            sort={sort || "newest"}
+            search={search}
+          />
         </Suspense>
       </div>
     </main>

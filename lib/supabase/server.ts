@@ -31,3 +31,34 @@ export function createClerkSupabaseClient() {
     },
   });
 }
+
+/**
+ * 공개 데이터 접근용 Supabase 클라이언트 (Server Component용)
+ *
+ * 홈페이지, 상품 목록 등 인증이 필요 없는 공개 데이터 접근 시 사용
+ * RLS가 비활성화되어 있으므로 anon key만으로 접근 가능
+ *
+ * @example
+ * ```tsx
+ * // Server Component
+ * import { createPublicSupabaseClient } from '@/lib/supabase/server';
+ *
+ * export default async function HomePage() {
+ *   const supabase = createPublicSupabaseClient();
+ *   const { data } = await supabase.from('products').select('*');
+ *   return <div>...</div>;
+ * }
+ * ```
+ */
+export function createPublicSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error(
+      "Supabase URL or Anon Key is missing. Please check your environment variables.",
+    );
+  }
+
+  return createClient(supabaseUrl, supabaseKey);
+}

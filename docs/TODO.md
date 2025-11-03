@@ -10,15 +10,103 @@
 
 - [ ] Phase 2: 상품 기능
 
-  - [ ] 홈 페이지
-    - [ ] 상품 목록 표시 (전체 상품 또는 제한된 개수)
-    - [ ] 카테고리 기능 (카테고리별 상품 필터링)
-    - [ ] 인기 상품 기능 (인기 상품 섹션 표시)
+  - [ ] 홈페이지
+    - [x] 상품 목록 표시 (전체 상품 또는 제한된 개수)
+      - [x] **구현 목표**: 홈페이지에 상품 목록을 표시하여 사용자가 쇼핑을 시작할 수 있도록 함
+      - [x] Server Component에서 Supabase로부터 상품 데이터 페칭 (`createPublicSupabaseClient` 사용, is_active=true, 최신순 정렬)
+      - [x] 상품 개수 제한 설정 (홈페이지 최대 12개로 설정 완료)
+      - [x] 상품 카드 컴포넌트 구현 (`components/product-card.tsx`)
+        - [x] 상품 이미지 영역 (Package 아이콘 placeholder 구현 완료)
+        - [x] 상품명 표시 (line-clamp-2로 2줄 제한)
+        - [x] 가격 표시 (숫자 포맷팅: `formatPrice` 함수로 "89,000원" 형식)
+        - [x] 카테고리 뱃지 표시 (한글 라벨 매핑 포함)
+        - [x] 재고 상태 표시 (품절/재고부족 뱃지, 재고 개수 표시)
+        - [x] 클릭 시 상품 상세 페이지로 이동 (`/products/[id]` - Link 컴포넌트)
+      - [x] 상품 목록 그리드 레이아웃 구현 (반응형: 모바일 1열, 태블릿 2열, 데스크톱 3-4열)
+      - [x] 로딩 상태 UI 구현 (Suspense를 활용한 스켈레톤 로더 추가 완료)
+        - [x] shadcn/ui skeleton 컴포넌트 설치
+        - [x] ProductCardSkeleton 컴포넌트 구현
+        - [x] ProductsList 컴포넌트 분리 (Server Component)
+        - [x] Suspense 적용 및 로딩 폴백 설정
+        - [x] Error Boundary 추가 (`app/error.tsx`)
+      - [x] 에러 상태 처리 (ErrorState 컴포넌트로 에러 메시지 표시, 환경변수 체크 포함)
+      - [x] 빈 상태 처리 (EmptyState 컴포넌트로 상품 없을 때 안내 메시지 표시)
+      - [x] 핵심 로직에 로그 추가 (console.group으로 데이터 페칭 성공/실패, 상품 개수, 카테고리별 통계 로깅)
+      - [x] Hydration 문제 해결 (ProductCard를 클라이언트 컴포넌트로 분리)
+    - [x] 카테고리 기능 (카테고리별 상품 필터링)
+      - [x] 카테고리 상수 정의 (`constants/categories.ts`): 카테고리 코드와 한글 라벨 매핑
+      - [x] 카테고리 필터 컴포넌트 (`components/category-filter.tsx`): URL 쿼리 파라미터 기반 필터링 버튼 UI
+      - [x] 홈페이지에 "전체 상품" 제목 및 카테고리 필터 추가 (`app/page.tsx`)
+      - [x] 상품 목록 컴포넌트에 카테고리 필터링 로직 추가 (`components/products-list.tsx`)
+      - [x] URL 쿼리 파라미터 사용 (`?category=electronics`)으로 공유/검색 가능 및 브라우저 뒤로가기 지원
+      - [x] 서버 사이드 필터링으로 성능 최적화
+    - [x] 인기 상품 기능 (인기 상품 섹션 표시)
+      - [x] 인기 상품 목록 컴포넌트 생성 (`components/popular-products.tsx`): 최신순 상품 중 8개 표시
+      - [x] 홈페이지에 인기 상품 섹션 추가 (`app/page.tsx`): 페이지 헤더 아래 배치
+      - [x] "🔥 인기 상품" 제목 추가
+      - [x] Suspense를 활용한 로딩 상태 처리 (PopularProductsLoading 컴포넌트)
+      - [x] 기존 ProductCard 컴포넌트 재사용
+      - [x] 핵심 로직에 로그 추가 (console.group으로 데이터 페칭 성공/실패, 상품 개수, 카테고리별 통계 로깅)
   - [ ] 상품 목록 페이지
-    - [ ] 페이지네이션 구현
-    - [ ] 정렬 기능 (가격, 최신순, 인기순)
-    - [ ] 카테고리 필터링
-    - [ ] 검색 기능 (선택사항)
+    - [ ] **구현 목표**: 전체 상품을 조회하고 필터링/정렬할 수 있는 전용 페이지 제공
+    - [x] 페이지 라우트 생성 (`app/products/page.tsx`)
+      - [x] Server Component로 구현 (Next.js App Router)
+      - [x] URL 쿼리 파라미터 처리 (`category`, `sort`, `page`, `search`)
+      - [x] 홈페이지와 동일한 레이아웃 구조 적용 (헤더, 필터, 목록)
+    - [x] 페이지네이션 구현
+      - [x] URL 쿼리 파라미터 기반 페이지네이션 (`?page=1`, `?page=2`)
+      - [x] 한 페이지당 상품 개수 설정 (20개로 설정 완료)
+      - [x] 페이지네이션 UI 컴포넌트 생성 (`components/products-pagination.tsx`)
+        - [x] 이전/다음 버튼
+        - [x] 페이지 번호 표시 (현재 페이지 중심으로 앞뒤 몇 개만 표시)
+        - [x] 총 페이지 수 표시
+      - [x] Supabase 쿼리에 `range()` 메서드 적용 (offset 기반)
+      - [x] 총 상품 개수 조회 (`count()` 옵션 사용)
+    - [x] 정렬 기능 (가격, 최신순, 인기순)
+      - [x] 정렬 옵션 상수 정의 (`constants/sort-options.ts`): 코드와 한글 라벨 매핑
+      - [x] 정렬 UI 컴포넌트 생성 (`components/products-sort.tsx`)
+        - [x] 버튼 그룹으로 구현 (카테고리 필터와 동일한 스타일)
+        - [x] URL 쿼리 파라미터 기반 (`?sort=price_asc`, `?sort=price_desc`, `?sort=newest`, `?sort=popular`)
+      - [x] Supabase 쿼리 정렬 로직 추가 (`order()` 메서드)
+        - [x] 가격 오름차순: `order('price', { ascending: true })`
+        - [x] 가격 내림차순: `order('price', { ascending: false })`
+        - [x] 최신순: `order('created_at', { ascending: false })`
+        - [x] 인기순: (임시로 `order('created_at')` 또는 별도 로직 필요 시 추가)
+    - [x] 카테고리 필터링
+      - [x] 기존 `CategoryFilter` 컴포넌트 재사용
+      - [x] URL 쿼리 파라미터를 `/products` 경로로 변경 (`usePathname`으로 현재 경로 자동 감지)
+      - [x] 상품 목록 컴포넌트에 카테고리 필터링 로직 적용 (기존 `ProductsList` 로직 재사용)
+    - [x] 검색 기능 (선택사항)
+      - [x] 검색 UI 컴포넌트 생성 (`components/products-search.tsx`)
+        - [x] Input 컴포넌트 사용 (shadcn/ui)
+        - [x] 실시간 검색 (debounce 500ms 적용)
+        - [x] 검색 버튼 및 Enter 키 지원
+        - [x] URL 쿼리 파라미터 기반 (`?search=키워드`)
+      - [x] Supabase 쿼리에 `ilike` 적용
+        - [x] 상품명(`name`) 및 설명(`description`) 필드 검색 (OR 조건)
+      - [x] 검색 결과 없을 때 UI 처리 (검색어, 카테고리별 상황별 메시지)
+    - [x] 상품 목록 컴포넌트 확장 (`components/products-list.tsx`)
+      - [x] 페이지네이션 파라미터 지원 (`page`, `itemsPerPage`)
+      - [x] 정렬 파라미터 지원 (`sort`)
+      - [x] 검색 파라미터 지원 (`search`)
+      - [x] 총 개수 반환 (페이지네이션을 위해) - `countQuery`로 `totalCount` 조회 및 반환
+      - [x] 기존 카테고리 필터링 로직 유지 (`category` 파라미터)
+    - [x] 로딩 상태 처리
+      - [x] Suspense를 활용한 스켈레톤 로더 적용 (`app/products/page.tsx`)
+      - [x] 기존 `ProductCardSkeleton` 컴포넌트 재사용
+      - [x] 페이지네이션 개수만큼 스켈레톤 표시 (20개 - `ProductsLoading` 컴포넌트)
+    - [x] 에러/빈 상태 처리
+      - [x] 에러 상태 컴포넌트 (`ProductsError`) - 환경변수 체크 포함, 홈페이지와 동일한 패턴
+      - [x] Error Boundary 추가 (`app/error.tsx`) - 전역 에러 처리
+      - [x] 빈 상태 컴포넌트 (검색 결과 없음, 필터 결과 없음 등 상황별 메시지) - `ProductsList` 및 `ProductsListWithPagination`에 구현
+    - [ ] URL 쿼리 파라미터 관리
+      - [ ] 여러 파라미터 조합 지원 (`/products?category=electronics&sort=price_asc&page=2&search=키워드`)
+      - [ ] 파라미터 변경 시 페이지 리셋 (검색/정렬/카테고리 변경 시 `page=1`로 리셋)
+    - [ ] 핵심 로직에 로그 추가
+      - [ ] `console.group`으로 데이터 페칭 시작/종료 로깅
+      - [ ] 페이지네이션 정보 (현재 페이지, 총 페이지, 총 개수)
+      - [ ] 정렬/필터/검색 파라미터 로깅
+      - [ ] 성공/실패 여부 및 에러 정보
   - [ ] 상품 상세 페이지
     - [ ] 상품 정보 표시 (이름, 설명, 가격, 재고)
     - [ ] 카테고리 표시
