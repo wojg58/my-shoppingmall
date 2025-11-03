@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { ShoppingCart, AlertCircle } from "lucide-react";
-import { CartActions } from "@/components/cart-actions";
 
 /**
  * @file app/cart/page.tsx
@@ -132,7 +131,7 @@ async function CartContent() {
           </div>
 
           {/* 주문하기 버튼 */}
-          <Link href="/orders/new" className="block">
+          <Link href="/cart/checkout" className="block">
             <Button
               size="lg"
               className="w-full sm:w-auto min-w-[200px]"

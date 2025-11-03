@@ -234,74 +234,235 @@
   - [ ] 주문 프로세스
     - [ ] **구현 목표**: 장바구니의 상품들을 주문으로 변환하고, 배송 정보를 입력받아 주문을 생성하는 기능 제공
     - [ ] 주문 페이지 구현 (`app/orders/new/page.tsx`)
-      - [ ] Server Component로 장바구니 데이터 페칭
-        - [ ] `cart_items` + `products` JOIN 조회
-        - [ ] `clerk_id`로 필터링
-        - [ ] 주문 요약 정보 계산 (총액, 총 수량 등)
-        - [ ] 로딩 상태 처리 (Suspense + 스켈레톤)
-        - [ ] 에러 상태 처리
-        - [ ] 로그 추가
-      - [ ] 주문 요약 정보 표시 (상품 목록, 수량, 가격, 총액)
-        - [ ] 장바구니 아이템 목록 표시 (간소화된 형태)
-        - [ ] 상품별 소계 및 총액 표시
-        - [ ] 가격 포맷팅 (`formatPrice` 함수 사용)
-      - [ ] 배송지 정보 입력 폼
-        - [ ] Zod 스키마 작성 (`lib/schemas/order.ts`)
-          - [ ] 주소 (필수)
-          - [ ] 우편번호 (필수)
-          - [ ] 상세 주소 (선택)
-          - [ ] 연락처 (필수, 전화번호 형식 검증)
-        - [ ] react-hook-form 적용
-          - [ ] 폼 상태 관리
-          - [ ] 유효성 검사
-          - [ ] 에러 메시지 표시
-        - [ ] 입력 필드 UI
-          - [ ] shadcn/ui Input, Label 컴포넌트 사용
-          - [ ] 반응형 레이아웃
-      - [ ] 주문 메모 입력 기능
-        - [ ] Textarea 컴포넌트 사용
-        - [ ] 최대 글자 수 제한 (선택사항)
-        - [ ] 선택사항으로 표시
-      - [ ] 주문 테이블 저장 (`orders`, `order_items`)
-        - [ ] Server Action 생성 (`actions/order.ts`)
-          - [ ] `createOrder`: 주문 생성
-            - [ ] 장바구니 데이터 검증
-            - [ ] 재고 재확인 (주문 시점 재고 확인)
-            - [ ] `orders` 테이블에 주문 저장
-              - [ ] `clerk_id`, `total_amount`, `status='pending'`
-              - [ ] `shipping_address` (JSONB 형태로 저장)
-              - [ ] `order_note` 저장
-            - [ ] `order_items` 테이블에 주문 상품 저장
-              - [ ] 상품별로 `order_id`, `product_id`, `product_name`, `quantity`, `price` 저장
-            - [ ] 트랜잭션 처리 (주문 + 주문 상품 모두 성공해야 저장)
-            - [ ] 로그 추가 (주문 생성 성공/실패, 주문 정보 로깅)
-      - [ ] 주문 합계 검증 (장바구니 총액과 일치 여부 확인)
-        - [ ] 서버에서 장바구니 총액 재계산
-        - [ ] 주문 총액과 비교
-        - [ ] 불일치 시 에러 처리
-        - [ ] 로그 추가
-      - [ ] 주문 성공 후 처리
-        - [ ] 주문 성공 페이지로 리다이렉트 (`/orders/[id]/success`)
-        - [ ] 또는 주문 상세 페이지로 이동 (`/orders/[id]`)
+      - [x] Server Component로 장바구니 데이터 페칭
+        - [x] `cart_items` + `products` JOIN 조회 (`getCartItems` 사용)
+        - [x] `clerk_id`로 필터링
+        - [x] 주문 요약 정보 계산 (총액, 총 수량 등)
+        - [x] 로딩 상태 처리 (Suspense + 스켈레톤)
+        - [x] 에러 상태 처리
+        - [x] 로그 추가
+        - [x] 장바구니 비어있을 때 장바구니 페이지로 리다이렉트
+        - [x] 미로그인 시 로그인 페이지로 리다이렉트
+      - [x] 주문 요약 정보 표시 (상품 목록, 수량, 가격, 총액)
+        - [x] 주문 요약 컴포넌트 생성 (`components/order-summary.tsx`)
+        - [x] 장바구니 아이템 목록 표시 (간소화된 형태)
+        - [x] 상품별 소계 및 총액 표시
+        - [x] 가격 포맷팅 (`formatPrice` 함수 사용)
+        - [x] 총 상품 개수 표시
+        - [x] 품절 상품 확인 및 알림
+      - [x] 배송지 정보 입력 폼
+        - [x] Zod 스키마 작성 (`lib/schemas/order.ts`)
+          - [x] 주소 (필수, 최소 5자)
+          - [x] 우편번호 (필수, 5자리 숫자 형식)
+          - [x] 상세 주소 (선택, 최대 200자)
+          - [x] 연락처 (필수, 한국 전화번호 형식 검증)
+          - [x] 주문 메모 스키마 (선택, 최대 500자)
+          - [x] TypeScript 타입 추론 지원
+          - [x] 빈 문자열 처리 (undefined 변환)
+        - [x] react-hook-form 적용
+          - [x] 폼 상태 관리
+          - [x] 유효성 검사 (zodResolver 사용)
+          - [x] 에러 메시지 표시
+          - [x] 실시간 검증 (onChange 모드)
+        - [x] 입력 필드 UI
+          - [x] shadcn/ui Input, Label, Textarea 컴포넌트 사용
+          - [x] 반응형 레이아웃
+          - [x] 배송지 정보 입력 폼 컴포넌트 생성 (`components/shipping-form.tsx`)
+          - [x] 주문 폼 래퍼 컴포넌트 생성 (`components/order-form-wrapper.tsx`)
+          - [x] 주문 페이지에 폼 통합
+      - [x] 주문 메모 입력 기능
+        - [x] Textarea 컴포넌트 사용
+        - [x] 최대 글자 수 제한 (500자)
+        - [x] 선택사항으로 표시
+      - [x] 주문 테이블 저장 (`orders`, `order_items`)
+        - [x] Server Action 생성 (`actions/order.ts`)
+          - [x] `createOrder`: 주문 생성
+            - [x] 장바구니 데이터 검증
+            - [x] 재고 재확인 (주문 시점 재고 확인)
+            - [x] 품절 상품 확인
+            - [x] `orders` 테이블에 주문 저장
+              - [x] `clerk_id`, `total_amount`, `status='pending'`
+              - [x] `shipping_address` (JSONB 형태로 저장)
+              - [x] `order_note` 저장
+            - [x] `order_items` 테이블에 주문 상품 저장
+              - [x] 상품별로 `order_id`, `product_id`, `product_name`, `quantity`, `price` 저장
+            - [x] 트랜잭션 처리 (주문 상품 저장 실패 시 주문 롤백)
+            - [x] 로그 추가 (주문 생성 성공/실패, 주문 정보 로깅)
+            - [x] 캐시 무효화 (revalidatePath)
+      - [x] 주문 합계 검증 (장바구니 총액과 일치 여부 확인)
+        - [x] 서버에서 장바구니 총액 재계산
+        - [x] 주문 총액과 비교
+        - [x] 불일치 시 에러 처리
+        - [x] 로그 추가
+      - [x] 주문 폼 제출 기능 연결
+        - [x] OrderFormWrapper에 createOrder 호출 추가
+        - [x] 주문 성공 시 리다이렉트 처리 (`/orders/[id]/success`)
+        - [x] 에러 처리 및 피드백 표시
+      - [x] 주문 성공 후 처리
+        - [x] 주문 성공 페이지 구현 (`/orders/[id]/success`)
+          - [x] 주문 조회 Server Action 추가 (`getOrder`)
+          - [x] 주문 정보 표시 (주문 번호, 총액, 상태, 배송지)
+          - [x] 주문 상품 목록 표시
+          - [x] 성공 메시지 및 아이콘 표시
+          - [x] 다음 액션 버튼 (홈으로, 쇼핑 계속하기)
+          - [x] 로딩 상태 처리 (Suspense + 스켈레톤)
+          - [x] 에러 상태 처리
+          - [x] 로그 추가
+        - [x] 주문 성공 페이지로 리다이렉트 (주문 생성 후)
+        - [ ] 주문 상세 페이지 구현 (`/orders/[id]`) - 선택사항
         - [ ] 장바구니는 Phase 4에서 결제 완료 후 비우기 (현재는 유지)
 
-- [ ] Phase 4: 결제 통합 (Toss Payments 테스트 모드)
+- [x] Phase 4: 결제 통합 (Toss Payments v1 테스트 모드)
 
-  - [ ] Toss Payments MCP 연동
-    - [ ] Toss Payments 클라이언트 설정
-    - [ ] 결제위젯 연동
-    - [ ] 테스트 모드 환경변수 설정
-  - [ ] 결제 플로우 구현
-    - [ ] 주문 페이지에서 결제 버튼 클릭 시 결제위젯 실행
-    - [ ] 결제 금액 검증 (주문 총액과 일치)
-    - [ ] 결제 성공 콜백 처리
-    - [ ] 결제 실패 콜백 처리
-    - [ ] 결제 취소 처리
-  - [ ] 결제 완료 후 처리
-    - [ ] 결제 완료 후 주문 상태 업데이트 (`orders.status` = 'confirmed')
-    - [ ] 결제 완료 페이지 표시 (주문 번호, 결제 정보)
-    - [ ] 장바구니 비우기 (`cart_items` 삭제)
-    - [ ] 상품 재고 감소 처리 (`products.stock_quantity` 업데이트)
+  - [x] **참고사항**
+
+    - [x] v1 결제창 SDK 사용 (v2가 아닌 이유: v2 결제위젯은 사업자 등록 필요)
+    - [x] 테스트 결제만 구현 (DB 스키마 변경 없음)
+    - [x] 결제 완료 시 `orders.status = 'confirmed'`만 업데이트
+    - [x] 장바구니 비우기 및 재고 감소 포함
+
+  - [x] 1단계: v1 결제창 SDK 전환
+
+    - [x] npm 패키지 설치 (`@tosspayments/payment-sdk`)
+    - [x] 기존 v2 코드 수정
+      - [x] `lib/tosspayments/client.ts` (v2 → v1 전환)
+        - [x] `loadTossPayments`: npm 패키지 우선, 스크립트 폴백
+        - [x] `initializeTossPayments`: v1 결제창 초기화 로직
+        - [x] v2 위젯 관련 함수 제거 (`createPaymentWidget`)
+      - [x] `components/tosspayments-script.tsx` (v2 스크립트 → v1 스크립트 변경)
+        - [x] `https://js.tosspayments.com/v1/payment` 로 변경
+    - [x] v1 결제창 SDK 스크립트 로드 확인
+    - [x] v1 클라이언트 초기화 로직 구현 완료
+    - [x] v1 `requestPayment` 메서드 사용법 확인 및 적용
+
+  - [x] 2단계: 장바구니 페이지 결제 버튼 연동 (우선 구현)
+
+    - [x] 결제 버튼 컴포넌트 생성 (`components/cart-payment-button.tsx`)
+      - [x] v1 결제창 초기화 및 호출 로직
+      - [x] 결제 정보 구성 (amount, orderId, orderName, successUrl, failUrl)
+      - [x] 임시 주문 ID 생성 (UUID)
+      - [x] 주문명 생성 (상품명 기반)
+      - [x] 로딩 및 에러 상태 관리
+    - [x] 장바구니 페이지에 결제 버튼 통합
+      - [x] "주문하기" 버튼 → "결제하기" 버튼으로 변경
+      - [x] `CartPaymentButton` 컴포넌트 사용
+    - [x] 결제 전 배송지 정보 입력 단계 추가
+      - [x] 배송지 정보 입력 폼 추가
+        - [x] Zod 스키마 작성 (`lib/schemas/order.ts`)
+          - [x] 받는 사람 이름 (필수, 최소 2자) - 추가 완료
+          - [x] 주소 (필수, 최소 5자)
+          - [x] 우편번호 (필수, 5자리 숫자 형식)
+          - [x] 상세 주소 (선택, 최대 200자)
+          - [x] 연락처 (필수, 한국 전화번호 형식 검증)
+          - [x] 주문 메모 스키마 (선택, 최대 500자)
+          - [x] TypeScript 타입 추론 지원
+          - [x] 빈 문자열 처리 (undefined 변환)
+        - [x] react-hook-form 적용
+          - [x] 폼 상태 관리
+          - [x] 유효성 검사 (zodResolver 사용)
+          - [x] 에러 메시지 표시
+          - [x] 실시간 검증 (onChange 모드)
+        - [x] 배송지 정보 입력 UI 통합
+          - [x] `components/shipping-form.tsx`에 받는 사람 이름 필드 추가
+          - [x] 장바구니 체크아웃 페이지 생성 (`/cart/checkout`)
+          - [x] 배송지 정보 입력 후 결제창 열기 플로우
+          - [x] 세션 스토리지를 통한 배송지 정보 전달
+        - [x] 결제창 호출 시 배송지 정보 전달
+          - [x] 배송지 정보를 결제 승인 시 주문 저장에 사용
+          - [x] `confirmPaymentAndCreateOrder`에 배송지 정보 파라미터 추가
+      - [x] 주문 메모 입력 기능
+        - [x] Textarea 컴포넌트 사용
+        - [x] 최대 글자 수 제한 (500자)
+        - [x] 선택사항으로 표시
+    - [x] 결제 성공/실패 페이지 생성
+      - [x] `/cart/payment/success` 페이지 생성
+      - [x] `/cart/payment/fail` 페이지 생성
+      - [x] URL 파라미터 처리 (paymentKey, orderId, amount, code, message)
+
+  - [ ] 2-2단계: 주문 페이지 결제창 연동 (추후 구현)
+
+    - [ ] 주문 생성 후 결제창 열기 플로우 수정
+      - [ ] `OrderPaymentFlow` 컴포넌트 수정 (v1 결제창 호출)
+      - [ ] 주문 생성 완료 후 결제창 자동 호출
+      - [ ] 결제 정보 설정 (amount, orderId, orderName, successUrl, failUrl 등)
+    - [ ] 결제창 호출 파라미터 구성
+      - [ ] 결제 수단: "카드" (테스트용)
+      - [ ] 결제 금액: 주문 총액
+      - [ ] 주문 ID: 생성된 orderId
+      - [ ] 주문명: 상품명 생성 (예: "상품명 외 N건")
+      - [ ] 성공 URL: `/orders/[id]/payment/success`
+      - [ ] 실패 URL: `/orders/[id]/payment/fail`
+
+  - [x] 3단계: 결제 성공/실패 콜백 처리
+
+    - [x] 결제 성공 페이지 (`/cart/payment/success`)
+      - [x] URL 파라미터에서 `paymentKey`, `orderId`, `amount` 추출
+      - [x] 결제 금액 검증 (장바구니 총액과 일치 확인)
+      - [x] 결제 승인 Server Action 호출 (`confirmPaymentAndCreateOrder`)
+      - [x] 성공 메시지 및 주문 정보 표시
+      - [x] 배송지 정보 세션 스토리지에서 로드 및 전달
+      - [x] 주문 저장 완료 후 세션 스토리지 정리
+    - [x] 결제 실패 페이지 (`/cart/payment/fail`)
+      - [x] URL 파라미터에서 `code`, `message` 추출
+      - [x] 실패 메시지 표시 (에러 코드 매핑 포함)
+      - [x] 재시도 옵션 제공
+    - [ ] 주문 페이지 결제창 연동 (`/orders/[id]/payment/success`, `/orders/[id]/payment/fail`) - 추후 구현 (현재는 장바구니 결제만 구현)
+
+  - [x] 4단계: 결제 승인 및 주문 저장 구현
+
+    - [x] Server Action 생성 (`actions/payment.ts`)
+      - [x] `confirmPaymentAndCreateOrder`: 결제 승인 및 주문 저장 처리
+        - [x] 인증 확인 (Clerk userId)
+        - [x] 입력 데이터 검증 (paymentKey, orderId, amount)
+        - [x] 장바구니 데이터 조회 (`getCartItems`)
+        - [x] 결제 금액 검증 (장바구니 총액과 일치 확인)
+        - [x] 재고 및 품절 확인
+        - [x] Toss Payments 결제 승인 API 호출
+          - [x] API 엔드포인트: `POST /v1/payments/confirm`
+          - [x] 인증: Basic Auth (secretKey: base64)
+          - [x] 요청 본문: `{ paymentKey, orderId, amount }`
+        - [x] 결제 승인 성공 시 주문 생성
+          - [x] `orders` 테이블에 주문 저장 (status='confirmed')
+          - [x] `order_items` 테이블에 주문 상품 저장
+          - [x] 트랜잭션 처리 (주문 상품 저장 실패 시 주문 롤백)
+        - [x] 로그 추가 (승인 성공/실패, 결제 정보)
+        - [x] 캐시 무효화 (revalidatePath)
+        - [x] 에러 처리 (네트워크 에러, API 에러 등)
+    - [x] 결제 성공 페이지에서 결제 승인 및 주문 저장 호출
+      - [x] `/cart/payment/success` 페이지 수정
+      - [x] 결제 승인 및 주문 저장 로직 통합
+      - [x] 로딩 상태 처리
+      - [x] 에러 상태 처리
+      - [x] 성공 시 주문 정보 표시
+
+  - [x] 5단계: 결제 완료 후 처리
+
+    - [x] 결제 승인 성공 후 자동 처리
+      - [x] 장바구니 비우기 (`cart_items` 테이블에서 해당 사용자 데이터 삭제)
+        - [x] `clearCart` Server Action 생성 (`actions/cart.ts`)
+        - [x] `clerk_id`로 필터링하여 모든 장바구니 아이템 삭제
+        - [x] 삭제 전 아이템 개수 확인 및 로깅
+      - [x] 상품 재고 감소 처리 (`products.stock_quantity` 업데이트)
+        - [x] `order_items` 테이블에서 주문 상품 조회 (이미 저장됨)
+        - [x] 각 상품별로 재고 감소 (`stock_quantity -= quantity`)
+        - [x] 재고가 0 미만으로 내려가지 않도록 검증
+        - [x] 재고 감소 실패 시 경고 로그 (주문은 완료 상태 유지)
+      - [x] 트랜잭션 처리
+        - [x] 주문 저장 → 주문 상품 저장 → 재고 감소 → 장바구니 비우기 순서로 처리
+        - [x] 각 단계별 에러 처리 및 로깅
+        - [x] 주문은 완료 상태로 유지 (재고/장바구니 처리 실패해도 주문은 성공)
+    - [x] 결제 완료 페이지 개선
+      - [x] 결제 승인 완료 상태 표시 ✅ 이미 구현됨
+      - [x] 주문 저장 완료 메시지 표시
+      - [x] 장바구니 비우기 및 재고 감소는 백그라운드에서 자동 처리 (사용자에게 명시적 표시하지 않음)
+
+  - [x] 6단계: 환경변수 및 설정
+    - [x] v1 환경변수 확인
+      - [x] `NEXT_PUBLIC_TOSS_CLIENT_KEY` (v1 API 개별 연동 키)
+      - [x] `TOSS_SECRET_KEY` (v1 시크릿 키)
+    - [x] 테스트 키 발급 확인
+      - [x] 토스페이먼츠 개발자센터에서 v1 테스트 키 확인 방법 문서화 (README.md, AGENTS.md)
+      - [x] 환경변수 설정 가이드 제공
 
 - [ ] Phase 5: 마이페이지
 

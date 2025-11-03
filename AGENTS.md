@@ -132,7 +132,7 @@ supabase/migrations/20241030014800_create_users_table.sql
 
 ## Environment Variables
 
-`.env.example` 참고하여 `.env` 파일 생성:
+`.env.local` 파일을 생성하고 아래 환경변수를 입력하세요:
 
 ```bash
 # Clerk Authentication
@@ -147,7 +147,44 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_STORAGE_BUCKET=uploads
+
+# Toss Payments (테스트 모드)
+# 개발자센터: https://developers.tosspayments.com
+# 1. 로그인 후 "내 상점" → "API 키" 메뉴
+# 2. "결제위젯 연동 키" 섹션에서 테스트 키 복사
+NEXT_PUBLIC_TOSS_CLIENT_KEY=
+TOSS_SECRET_KEY=
 ```
+
+### Toss Payments API 키 발급 방법
+
+1. **토스페이먼츠 개발자센터 접속**
+   - https://developers.tosspayments.com
+   - 로그인 (또는 회원가입)
+
+2. **내 상점 메뉴**
+   - 상단 메뉴에서 "내 상점" 클릭
+   - 또는 직접: https://developers.tosspayments.com/my-shop
+
+3. **API 키 확인**
+   - "API 키" 메뉴 선택
+   - "결제위젯 연동 키" 섹션 확인
+   - 테스트 환경의 키 사용:
+     - **클라이언트 키** (결제위젯 연동 키): `test_ck_...`로 시작
+     - **시크릿 키**: `test_sk_...`로 시작
+
+4. **환경변수에 입력**
+   ```bash
+   # .env.local 파일에 복사한 키 입력
+   NEXT_PUBLIC_TOSS_CLIENT_KEY=test_ck_xxxxxxxxxxxxxxxxxxxxx
+   TOSS_SECRET_KEY=test_sk_xxxxxxxxxxxxxxxxxxxxx
+   ```
+
+5. **확인사항**
+   - 테스트 모드에서는 실제 결제가 발생하지 않습니다
+   - 프로덕션 배포 시에는 라이브 키를 사용하세요
+   - `NEXT_PUBLIC_` 접두사가 있는 키는 클라이언트에 노출됩니다
+   - `TOSS_SECRET_KEY`는 서버 사이드에서만 사용하며 절대 공개하지 마세요
 
 ## Development Guidelines
 
