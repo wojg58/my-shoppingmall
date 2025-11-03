@@ -3,10 +3,10 @@ import { notFound } from "next/navigation";
 import { createPublicSupabaseClient } from "@/lib/supabase/server";
 import { getCategoryLabel } from "@/constants/categories";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, Package, ShoppingCart } from "lucide-react";
+import { AlertCircle, Package } from "lucide-react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ProductQuantitySelector } from "@/components/product-quantity-selector";
+import { ProductCartActions } from "@/components/product-cart-actions";
 
 /**
  * @file app/products/[id]/page.tsx
@@ -221,20 +221,12 @@ async function ProductDetail({ productId }: { productId: string }) {
               {isOutOfStock ? (
                 <div className="space-y-4">
                   {/* 수량 선택 컴포넌트 (품절 시 비활성화) */}
-                  <ProductQuantitySelector
+                  <ProductCartActions
+                    productId={product.id}
+                    productName={product.name}
                     price={product.price}
                     stockQuantity={0}
-                    initialQuantity={1}
                   />
-                  <Button
-                    disabled
-                    className="w-full"
-                    size="lg"
-                    variant="outline"
-                  >
-                    <ShoppingCart className="w-5 h-5 mr-2" />
-                    품절된 상품입니다
-                  </Button>
                   <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
                     <div className="flex items-start gap-3">
                       <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
@@ -251,38 +243,12 @@ async function ProductDetail({ productId }: { productId: string }) {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {/* 수량 선택 컴포넌트 */}
-                  <ProductQuantitySelector
-                    price={product.price}
-                    stockQuantity={product.stock_quantity}
-                    initialQuantity={1}
-                  />
-                  <Button
-                    className="w-full"
-                    size="lg"
-                    disabled={false} // Phase 3에서 장바구니 기능 구현 예정
-                  >
-                    <ShoppingCart className="w-5 h-5 mr-2" />
-                    장바구니에 담기
-                  </Button>
-                  {isLowStock && (
-                    <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
-                      <div className="flex items-start gap-3">
-                        <AlertCircle className="w-5 h-5 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
-                        <div>
-                          <p className="text-sm font-medium text-orange-900 dark:text-orange-100">
-                            재고 부족 알림
-                          </p>
-                          <p className="text-sm text-orange-700 dark:text-orange-300 mt-1">
-                            남은 재고가 {product.stock_quantity}개뿐입니다.
-                            빠르게 주문해주세요!
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <ProductCartActions
+                  productId={product.id}
+                  productName={product.name}
+                  price={product.price}
+                  stockQuantity={product.stock_quantity}
+                />
               )}
             </div>
           </div>
