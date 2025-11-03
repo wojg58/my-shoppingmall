@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { AlertCircle, Package, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ProductQuantitySelector } from "@/components/product-quantity-selector";
 
 /**
  * @file app/products/[id]/page.tsx
@@ -215,10 +216,16 @@ async function ProductDetail({ productId }: { productId: string }) {
               </div>
             )}
 
-            {/* 장바구니 담기 버튼 */}
+            {/* 수량 선택 및 장바구니 담기 */}
             <div className="mt-auto pt-6 border-t border-gray-200 dark:border-gray-700">
               {isOutOfStock ? (
                 <div className="space-y-4">
+                  {/* 수량 선택 컴포넌트 (품절 시 비활성화) */}
+                  <ProductQuantitySelector
+                    price={product.price}
+                    stockQuantity={0}
+                    initialQuantity={1}
+                  />
                   <Button
                     disabled
                     className="w-full"
@@ -245,6 +252,12 @@ async function ProductDetail({ productId }: { productId: string }) {
                 </div>
               ) : (
                 <div className="space-y-4">
+                  {/* 수량 선택 컴포넌트 */}
+                  <ProductQuantitySelector
+                    price={product.price}
+                    stockQuantity={product.stock_quantity}
+                    initialQuantity={1}
+                  />
                   <Button
                     className="w-full"
                     size="lg"
