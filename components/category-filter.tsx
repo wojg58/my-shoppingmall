@@ -44,12 +44,26 @@ export function CategoryFilter() {
 
     const params = new URLSearchParams(searchParams.toString());
 
+    // 카테고리 변경 시 페이지를 1로 리셋
+    params.delete("page");
+
     if (category && isValidCategory(category)) {
       params.set("category", category);
       console.log("URL 파라미터 설정:", `?category=${category}`);
     } else {
       params.delete("category");
       console.log("URL 파라미터 제거 (전체 상품 표시)");
+    }
+
+    // 다른 파라미터 유지 (sort, search)
+    const sort = searchParams.get("sort");
+    if (sort && sort !== "newest") {
+      params.set("sort", sort);
+    }
+
+    const search = searchParams.get("search");
+    if (search) {
+      params.set("search", search);
     }
 
     // 현재 경로를 유지하면서 URL 업데이트

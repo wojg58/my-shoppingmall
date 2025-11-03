@@ -50,6 +50,14 @@ export async function ProductsList({
   search = null,
 }: ProductsListProps) {
   console.group("📦 상품 목록 데이터 페칭 시작");
+  console.log("📋 입력 파라미터:", {
+    category: category || "(없음)",
+    sort: sort || "newest (기본값)",
+    page: page || "(없음)",
+    search: search || "(없음)",
+    limit: limit || "(없음)",
+    itemsPerPage,
+  });
 
   try {
     const supabase = createPublicSupabaseClient();
@@ -175,6 +183,12 @@ export async function ProductsList({
       console.error("  - 에러 메시지:", error.message);
       console.error("  - 에러 세부사항:", error.details);
       console.error("  - 전체 에러 객체:", JSON.stringify(error, null, 2));
+      console.error("  - 현재 필터 조건:", {
+        카테고리: validCategory || "(전체)",
+        정렬: sortLabel,
+        검색어: searchTerm || "(없음)",
+        페이지: usePagination ? currentPage : "(없음)",
+      });
       console.groupEnd();
 
       let errorMessage = error.message || "알 수 없는 오류가 발생했습니다.";
@@ -202,14 +216,25 @@ export async function ProductsList({
       : 1;
 
     console.log("✅ 상품 데이터 조회 성공:", productCount, "개");
-    if (usePagination) {
-      console.log("📊 페이지네이션 정보:", {
-        현재페이지: currentPage,
-        총상품수: totalCount,
-        총페이지수: totalPages,
-        페이지당상품수: itemsPerPageValue,
-      });
-    }
+
+    // 상세 정보 로깅
+    console.log("📊 조회 결과 상세 정보:", {
+      조회된상품수: productCount,
+      총상품수: totalCount,
+      ...(usePagination && {
+        페이지네이션: {
+          현재페이지: currentPage,
+          총페이지수: totalPages,
+          페이지당상품수: itemsPerPageValue,
+          범위: `${from} ~ ${to}`,
+        },
+      }),
+      필터조건: {
+        카테고리: validCategory || "(전체)",
+        정렬: sortLabel,
+        검색어: searchTerm || "(없음)",
+      },
+    });
 
     // 페이지네이션 사용 시 ProductsListWithPagination 컴포넌트 사용
     if (usePagination) {
@@ -272,6 +297,13 @@ export async function ProductsList({
       );
     }
 
+    if (searchTerm) {
+      console.log(
+        `✅ 검색어 "${searchTerm}" 검색 완료: ${productCount}개 상품`,
+      );
+    }
+
+    console.log("🎯 최종 결과: 상품 목록 렌더링 완료");
     console.groupEnd();
 
     return (

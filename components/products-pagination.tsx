@@ -61,9 +61,19 @@ export function ProductsPagination({
       params.set("page", page.toString());
     }
 
-    // 카테고리 파라미터 유지
+    // 다른 파라미터 유지 (category, sort, search)
     if (category) {
       params.set("category", category);
+    }
+
+    const sort = searchParams.get("sort");
+    if (sort && sort !== "newest") {
+      params.set("sort", sort);
+    }
+
+    const search = searchParams.get("search");
+    if (search) {
+      params.set("search", search);
     }
 
     const finalUrl = params.toString()

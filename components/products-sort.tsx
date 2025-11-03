@@ -54,10 +54,15 @@ export function ProductsSort() {
       params.set("sort", sort);
     }
 
-    // 카테고리 파라미터 유지
+    // 다른 파라미터 유지 (category, search)
     const category = searchParams.get("category");
     if (category) {
       params.set("category", category);
+    }
+
+    const search = searchParams.get("search");
+    if (search) {
+      params.set("search", search);
     }
 
     const basePath = pathname || "/products";

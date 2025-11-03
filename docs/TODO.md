@@ -99,19 +99,29 @@
       - [x] 에러 상태 컴포넌트 (`ProductsError`) - 환경변수 체크 포함, 홈페이지와 동일한 패턴
       - [x] Error Boundary 추가 (`app/error.tsx`) - 전역 에러 처리
       - [x] 빈 상태 컴포넌트 (검색 결과 없음, 필터 결과 없음 등 상황별 메시지) - `ProductsList` 및 `ProductsListWithPagination`에 구현
-    - [ ] URL 쿼리 파라미터 관리
-      - [ ] 여러 파라미터 조합 지원 (`/products?category=electronics&sort=price_asc&page=2&search=키워드`)
-      - [ ] 파라미터 변경 시 페이지 리셋 (검색/정렬/카테고리 변경 시 `page=1`로 리셋)
-    - [ ] 핵심 로직에 로그 추가
-      - [ ] `console.group`으로 데이터 페칭 시작/종료 로깅
-      - [ ] 페이지네이션 정보 (현재 페이지, 총 페이지, 총 개수)
-      - [ ] 정렬/필터/검색 파라미터 로깅
-      - [ ] 성공/실패 여부 및 에러 정보
-  - [ ] 상품 상세 페이지
-    - [ ] 상품 정보 표시 (이름, 설명, 가격, 재고)
-    - [ ] 카테고리 표시
-    - [ ] 장바구니 담기 버튼
-    - [ ] 재고 부족 시 알림 표시
+    - [x] URL 쿼리 파라미터 관리
+      - [x] 여러 파라미터 조합 지원 (`/products?category=electronics&sort=price_asc&page=2&search=키워드`)
+        - [x] 모든 컴포넌트에서 다른 파라미터 유지 로직 구현 (CategoryFilter, ProductsSort, ProductsSearch, ProductsPagination)
+      - [x] 파라미터 변경 시 페이지 리셋 (검색/정렬/카테고리 변경 시 `page=1`로 리셋)
+        - [x] CategoryFilter: 카테고리 변경 시 페이지 리셋
+        - [x] ProductsSort: 정렬 변경 시 페이지 리셋
+        - [x] ProductsSearch: 검색 변경 시 페이지 리셋
+    - [x] 핵심 로직에 로그 추가
+      - [x] `console.group`으로 데이터 페칭 시작/종료 로깅 (`ProductsList`, `app/products/page.tsx`)
+      - [x] 입력 파라미터 로깅 (category, sort, page, search 등)
+      - [x] 페이지네이션 정보 (현재 페이지, 총 페이지, 총 개수, 범위)
+      - [x] 정렬/필터/검색 파라미터 로깅 (필터 조건 상세 정보)
+      - [x] 성공/실패 여부 및 에러 정보 (에러 발생 시 필터 조건 포함)
+      - [x] 카테고리별 통계 로깅
+      - [x] UI 컴포넌트 로깅 (CategoryFilter, ProductsSort, ProductsSearch, ProductsPagination)
+  - [x] 상품 상세 페이지
+    - [x] 상품 정보 표시 (이름, 설명, 가격, 재고) - `app/products/[id]/page.tsx`
+    - [x] 카테고리 표시 (한글 라벨 매핑 포함)
+    - [x] 장바구니 담기 버튼 (UI만, 기능은 Phase 3에서 구현 예정)
+    - [x] 재고 부족 시 알림 표시 (품절/재고부족 뱃지 및 알림 메시지)
+    - [x] 로딩 상태 처리 (Suspense + 스켈레톤)
+    - [x] 에러 상태 처리 (404 페이지, 환경변수 체크)
+    - [x] 핵심 로직에 로그 추가
   - [ ] 어드민 상품 등록은 대시보드에서 수기 관리 (문서화만)
 
 - [ ] Phase 3: 장바구니 & 주문
