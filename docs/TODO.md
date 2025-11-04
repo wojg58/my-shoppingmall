@@ -337,19 +337,28 @@
 
   - [x] 2단계: 장바구니 페이지 결제 버튼 연동 (우선 구현)
 
-    - [x] 결제 버튼 컴포넌트 생성 (`components/cart-payment-button.tsx`)
-      - [x] v1 결제창 초기화 및 호출 로직
-      - [x] 결제 정보 구성 (amount, orderId, orderName, successUrl, failUrl)
-      - [x] 임시 주문 ID 생성 (UUID)
+    - [x] 장바구니 페이지에서 체크아웃 플로우 구현
+      - [x] "주문하기" 버튼 → `/cart/checkout` 페이지로 이동
+      - [x] 체크아웃 페이지 레이아웃 구성 (주문 요약 좌측, 배송지 정보 우측)
+    - [x] 체크아웃 페이지 구현 (`app/cart/checkout/page.tsx`)
+      - [x] Server Component로 장바구니 데이터 페칭
+      - [x] `CartCheckoutContent` 컴포넌트 렌더링
+      - [x] 로딩/에러 상태 처리
+    - [x] 체크아웃 컨텐츠 컴포넌트 생성 (`components/cart-checkout-content.tsx`)
+      - [x] 배송지 정보 폼 통합 (`ShippingForm`)
+      - [x] 주문 요약 정보 표시 (`OrderSummary`)
+      - [x] 그리드 레이아웃 (주문 요약 1/3, 배송지 폼 2/3)
+      - [x] 폼 제출 시 결제창 호출 로직
+      - [x] 세션 스토리지를 통한 배송지 정보 저장
+      - [x] v1 결제창 초기화 및 호출 (`initializeTossPayments`)
+      - [x] 결제 정보 구성 (amount, orderId, orderName, customerName, successUrl, failUrl)
+      - [x] 임시 주문 ID 생성 (timestamp 기반)
       - [x] 주문명 생성 (상품명 기반)
       - [x] 로딩 및 에러 상태 관리
-    - [x] 장바구니 페이지에 결제 버튼 통합
-      - [x] "주문하기" 버튼 → "결제하기" 버튼으로 변경
-      - [x] `CartPaymentButton` 컴포넌트 사용
     - [x] 결제 전 배송지 정보 입력 단계 추가
-      - [x] 배송지 정보 입력 폼 추가
+      - [x] 배송지 정보 입력 폼 (`components/shipping-form.tsx`)
         - [x] Zod 스키마 작성 (`lib/schemas/order.ts`)
-          - [x] 받는 사람 이름 (필수, 최소 2자) - 추가 완료
+          - [x] 받는 사람 이름 (필수, 최소 2자, 최대 50자)
           - [x] 주소 (필수, 최소 5자)
           - [x] 우편번호 (필수, 5자리 숫자 형식)
           - [x] 상세 주소 (선택, 최대 200자)
@@ -362,18 +371,23 @@
           - [x] 유효성 검사 (zodResolver 사용)
           - [x] 에러 메시지 표시
           - [x] 실시간 검증 (onChange 모드)
-        - [x] 배송지 정보 입력 UI 통합
-          - [x] `components/shipping-form.tsx`에 받는 사람 이름 필드 추가
-          - [x] 장바구니 체크아웃 페이지 생성 (`/cart/checkout`)
-          - [x] 배송지 정보 입력 후 결제창 열기 플로우
-          - [x] 세션 스토리지를 통한 배송지 정보 전달
-        - [x] 결제창 호출 시 배송지 정보 전달
-          - [x] 배송지 정보를 결제 승인 시 주문 저장에 사용
-          - [x] `confirmPaymentAndCreateOrder`에 배송지 정보 파라미터 추가
-      - [x] 주문 메모 입력 기능
-        - [x] Textarea 컴포넌트 사용
-        - [x] 최대 글자 수 제한 (500자)
-        - [x] 선택사항으로 표시
+        - [x] 배송지 정보 입력 UI
+          - [x] 받는 사람 이름 필드 (Input 컴포넌트)
+          - [x] 주소 필드 (Input 컴포넌트)
+          - [x] 우편번호 필드 (Input 컴포넌트)
+          - [x] 상세 주소 필드 (Input 컴포넌트, 선택사항)
+          - [x] 연락처 필드 (Input 컴포넌트)
+          - [x] 주문 메모 필드 (Textarea 컴포넌트, 선택사항)
+      - [x] 배송지 정보 입력 후 결제창 열기 플로우
+        - [x] 체크아웃 페이지에서 폼 제출
+        - [x] 폼 유효성 검사 통과 후 결제창 호출
+        - [x] 세션 스토리지를 통한 배송지 정보 전달 (`checkout_{orderId}` 키 사용)
+        - [x] 결제 성공 후 세션 스토리지에서 배송지 정보 로드
+      - [x] 결제창 호출 시 배송지 정보 활용
+        - [x] `customerName` 파라미터에 받는 사람 이름 전달
+        - [x] 배송지 정보를 결제 승인 시 주문 저장에 사용
+        - [x] `confirmPaymentAndCreateOrder`에 배송지 정보 파라미터 추가
+        - [x] 주문 생성 시 `shipping_address` 및 `order_note` 저장
     - [x] 결제 성공/실패 페이지 생성
       - [x] `/cart/payment/success` 페이지 생성
       - [x] `/cart/payment/fail` 페이지 생성
@@ -423,17 +437,25 @@
           - [x] 요청 본문: `{ paymentKey, orderId, amount }`
         - [x] 결제 승인 성공 시 주문 생성
           - [x] `orders` 테이블에 주문 저장 (status='confirmed')
+            - [x] `clerk_id`, `total_amount`, `status` 저장
+            - [x] `shipping_address` JSONB 필드에 배송지 정보 저장
+            - [x] `order_note` 필드에 주문 메모 저장 (선택사항)
           - [x] `order_items` 테이블에 주문 상품 저장
+            - [x] `order_id`, `product_id`, `product_name`, `quantity`, `price` 저장
           - [x] 트랜잭션 처리 (주문 상품 저장 실패 시 주문 롤백)
         - [x] 로그 추가 (승인 성공/실패, 결제 정보)
         - [x] 캐시 무효화 (revalidatePath)
         - [x] 에러 처리 (네트워크 에러, API 에러 등)
     - [x] 결제 성공 페이지에서 결제 승인 및 주문 저장 호출
-      - [x] `/cart/payment/success` 페이지 수정
-      - [x] 결제 승인 및 주문 저장 로직 통합
-      - [x] 로딩 상태 처리
-      - [x] 에러 상태 처리
-      - [x] 성공 시 주문 정보 표시
+      - [x] `/cart/payment/success` 페이지 구현 (`app/cart/payment/success/page.tsx`)
+        - [x] URL 파라미터에서 결제 정보 추출 (`paymentKey`, `orderId`, `amount`)
+        - [x] 세션 스토리지에서 배송지 정보 로드 (`checkout_{orderId}`)
+        - [x] 결제 승인 및 주문 저장 Server Action 호출 (`confirmPaymentAndCreateOrder`)
+        - [x] 로딩 상태 처리 (처리 중 표시)
+        - [x] 에러 상태 처리 (에러 메시지 및 재시도 옵션)
+        - [x] 성공 상태 표시 (결제 완료 메시지, 주문 번호, 결제 금액)
+        - [x] 주문 저장 완료 후 세션 스토리지 정리
+        - [x] 다음 액션 버튼 (홈으로, 쇼핑 계속하기)
 
   - [x] 5단계: 결제 완료 후 처리
 
@@ -443,10 +465,13 @@
         - [x] `clerk_id`로 필터링하여 모든 장바구니 아이템 삭제
         - [x] 삭제 전 아이템 개수 확인 및 로깅
       - [x] 상품 재고 감소 처리 (`products.stock_quantity` 업데이트)
-        - [x] `order_items` 테이블에서 주문 상품 조회 (이미 저장됨)
-        - [x] 각 상품별로 재고 감소 (`stock_quantity -= quantity`)
-        - [x] 재고가 0 미만으로 내려가지 않도록 검증
+        - [x] 저장된 `order_items`에서 주문 상품 목록 조회
+        - [x] 각 상품별로 현재 재고 조회
+        - [x] 재고 감소 계산 (`stock_quantity -= quantity`)
+        - [x] 재고가 0 미만으로 내려가지 않도록 검증 (재고 부족 시 경고 로그만)
+        - [x] `products` 테이블 업데이트 (`update` 쿼리)
         - [x] 재고 감소 실패 시 경고 로그 (주문은 완료 상태 유지)
+        - [x] 각 상품별 재고 감소 결과 로깅
       - [x] 트랜잭션 처리
         - [x] 주문 저장 → 주문 상품 저장 → 재고 감소 → 장바구니 비우기 순서로 처리
         - [x] 각 단계별 에러 처리 및 로깅
