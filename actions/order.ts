@@ -483,3 +483,227 @@ export async function getOrder(orderId: string): Promise<GetOrderResult> {
     };
   }
 }
+
+/**
+ * 주문 목록 조회 결과 타입
+ */
+export type GetOrdersResult =
+  | {
+      success: true;
+      data: Array<{
+        id: string;
+        clerk_id: string;
+        total_amount: number;
+        status: string;
+        created_at: string;
+        updated_at: string;
+      }>;
+    }
+  | {
+      success: false;
+      error: string;
+    };
+
+/**
+ * 주문 목록 조회
+ *
+ * @returns 사용자의 주문 목록 (최신순 정렬)
+ */
+export async function getOrders(): Promise<GetOrdersResult> {
+  console.group("📦 주문 목록 조회 시작");
+
+  try {
+    // 1. 인증 확인
+    const { userId } = await auth();
+    if (!userId) {
+      console.error("❌ 로그인하지 않은 사용자");
+      console.groupEnd();
+      return {
+        success: false,
+        error: "로그인이 필요합니다.",
+      };
+    }
+    console.log("✅ 사용자 인증 확인 완료:", userId);
+
+    // 2. Supabase 클라이언트 생성
+    const supabase = getServiceRoleClient();
+    console.log("✅ Supabase 클라이언트 생성 완료");
+
+    // 3. 주문 목록 조회 (clerk_id로 필터링, 최신순 정렬)
+    console.log("📦 주문 목록 조회 중...");
+    const { data: orders, error: ordersError } = await supabase
+      .from("orders")
+      .select("id, clerk_id, total_amount, status, created_at, updated_at")
+      .eq("clerk_id", userId) // 권한 검증
+      .order("created_at", { ascending: false }); // 최신순 정렬
+
+    if (ordersError) {
+      console.error("❌ 주문 목록 조회 실패:");
+      console.error("  - 에러 코드:", ordersError.code);
+      console.error("  - 에러 메시지:", ordersError.message);
+      console.groupEnd();
+      return {
+        success: false,
+        error: "주문 목록을 불러올 수 없습니다.",
+      };
+    }
+
+    if (!orders) {
+      console.log("⚠️ 주문 목록이 비어있음");
+      console.groupEnd();
+      return {
+        success: true,
+        data: [],
+      };
+    }
+
+    // 데이터 변환 (total_amount를 number로 변환)
+    const ordersData = orders.map((order) => ({
+      id: order.id,
+      clerk_id: order.clerk_id,
+      total_amount: Number(order.total_amount),
+      status: order.status,
+      created_at: order.created_at,
+      updated_at: order.updated_at,
+    }));
+
+    console.log("✅ 주문 목록 조회 완료:", {
+      주문개수: ordersData.length,
+    });
+    console.groupEnd();
+
+    return {
+      success: true,
+      data: ordersData,
+    };
+  } catch (error) {
+    console.error("❌ 예상치 못한 오류 발생:");
+    if (error instanceof Error) {
+      console.error("  - 에러 메시지:", error.message);
+      console.error("  - 스택 트레이스:", error.stack);
+    } else {
+      console.error("  - 에러 객체:", JSON.stringify(error, null, 2));
+    }
+    console.groupEnd();
+    return {
+      success: false,
+      error: "주문 목록 조회 중 오류가 발생했습니다.",
+    };
+  }
+}
+
+/**
+ * 주문 취소 결과 타입
+ */
+export type CancelOrderResult =
+  | {
+      success: true;
+    }
+  | {
+      success: false;
+      error: string;
+    };
+
+/**
+ * 주문 취소
+ *
+ * @param orderId 주문 ID
+ * @returns 주문 취소 결과
+ */
+export async function cancelOrder(orderId: string): Promise<CancelOrderResult> {
+  console.group("❌ 주문 취소 시작");
+  console.log("주문 ID:", orderId);
+
+  try {
+    // 1. 인증 확인
+    const { userId } = await auth();
+    if (!userId) {
+      console.error("❌ 로그인하지 않은 사용자");
+      console.groupEnd();
+      return {
+        success: false,
+        error: "로그인이 필요합니다.",
+      };
+    }
+    console.log("✅ 사용자 인증 확인 완료:", userId);
+
+    // 2. Supabase 클라이언트 생성
+    const supabase = getServiceRoleClient();
+    console.log("✅ Supabase 클라이언트 생성 완료");
+
+    // 3. 주문 정보 조회 및 권한 확인
+    console.log("📦 주문 정보 조회 중...");
+    const { data: order, error: orderError } = await supabase
+      .from("orders")
+      .select("id, clerk_id, status")
+      .eq("id", orderId)
+      .eq("clerk_id", userId) // 권한 검증
+      .single();
+
+    if (orderError || !order) {
+      console.error("❌ 주문 조회 실패:");
+      console.error("  - 에러 코드:", orderError?.code);
+      console.error("  - 에러 메시지:", orderError?.message);
+      console.groupEnd();
+      return {
+        success: false,
+        error: "주문을 찾을 수 없습니다.",
+      };
+    }
+
+    // 4. 주문 상태 확인 (pending일 때만 취소 가능)
+    if (order.status !== "pending") {
+      console.error("❌ 취소 불가능한 주문 상태:", order.status);
+      console.groupEnd();
+      return {
+        success: false,
+        error: "결제 대기 중인 주문만 취소할 수 있습니다.",
+      };
+    }
+
+    console.log("✅ 주문 상태 확인 완료:", order.status);
+
+    // 5. 주문 상태를 'cancelled'로 업데이트
+    console.log("🔄 주문 취소 처리 중...");
+    const { error: updateError } = await supabase
+      .from("orders")
+      .update({ status: "cancelled" })
+      .eq("id", orderId)
+      .eq("clerk_id", userId); // 권한 재확인
+
+    if (updateError) {
+      console.error("❌ 주문 취소 실패:");
+      console.error("  - 에러 코드:", updateError.code);
+      console.error("  - 에러 메시지:", updateError.message);
+      console.groupEnd();
+      return {
+        success: false,
+        error: "주문 취소에 실패했습니다.",
+      };
+    }
+
+    console.log("✅ 주문 취소 완료");
+    console.groupEnd();
+
+    // 6. 캐시 무효화
+    revalidatePath("/my-orders");
+    revalidatePath("/orders");
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("❌ 예상치 못한 오류 발생:");
+    if (error instanceof Error) {
+      console.error("  - 에러 메시지:", error.message);
+      console.error("  - 스택 트레이스:", error.stack);
+    } else {
+      console.error("  - 에러 객체:", JSON.stringify(error, null, 2));
+    }
+    console.groupEnd();
+    return {
+      success: false,
+      error: "주문 취소 중 오류가 발생했습니다.",
+    };
+  }
+}

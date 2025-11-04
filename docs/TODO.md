@@ -492,17 +492,32 @@
 - [ ] Phase 5: 마이페이지
 
   - [ ] 마이페이지 기본 구조
-    - [ ] 마이페이지 라우트 생성
+    - [x] 마이페이지 라우트 생성
+    - [x] GNB 마이페이지 링크 추가
     - [ ] 사용자 정보 표시 (Clerk 연동)
   - [ ] 주문 내역 조회
-    - [ ] 주문 목록 조회 (사용자별 `orders` 테이블 필터링)
+    - [x] 주문 목록 조회 (사용자별 `orders` 테이블 필터링)
+      - [x] `getOrders` Server Action 생성 (`actions/order.ts`)
+      - [x] `clerk_id`로 필터링, 최신순 정렬
+      - [x] 주문 목록 페이지 생성 (`app/my-orders/page.tsx`)
+      - [x] 주문 목록 컴포넌트 생성 (`components/orders-list.tsx`)
+      - [x] 주문 카드 컴포넌트 생성 (`components/order-card.tsx`)
+      - [x] 주문 상태 상수 정의 (`constants/order-status.ts`)
+      - [x] 로딩/에러/빈 상태 처리
+      - [x] 마이페이지에서 주문 내역 링크 추가
     - [ ] 주문 상태별 필터링 (pending, confirmed, shipped, delivered, cancelled)
     - [ ] 주문 목록 페이지네이션
-  - [ ] 주문 상세 보기
-    - [ ] 주문 상세 정보 표시 (주문 번호, 날짜, 총액, 상태)
-    - [ ] 주문 상품 목록 표시 (`order_items` 테이블 조회)
-    - [ ] 배송지 정보 표시
-    - [ ] 주문 취소 기능 (status = 'pending'일 때만 가능)
+  - [x] 주문 상세 보기
+    - [x] 주문 상세 정보 표시 (주문 번호, 날짜, 총액, 상태)
+      - [x] 아코디언 컴포넌트로 구현 (`components/order-detail-accordion.tsx`)
+      - [x] OrderCard를 아코디언으로 변경
+      - [x] 아코디언이 열릴 때만 데이터 로드 (성능 최적화)
+    - [x] 주문 상품 목록 표시 (`order_items` 테이블 조회)
+    - [x] 배송지 정보 표시
+    - [x] 주문 취소 기능 (status = 'pending'일 때만 가능)
+      - [x] `cancelOrder` Server Action 생성 (`actions/order.ts`)
+      - [x] 주문 취소 버튼 UI (pending 상태일 때만 표시)
+      - [x] 확인 다이얼로그 및 에러 처리
 
 - [ ] Phase 6: 테스트 & 배포
 
