@@ -99,7 +99,7 @@ export async function createOrder(
     console.log("🛒 장바구니 데이터 조회 중...");
     const cartResult = await getCartItems();
 
-    if (!cartResult.success) {
+    if (cartResult.success === false) {
       console.error("❌ 장바구니 조회 실패:", cartResult.error);
       console.groupEnd();
       return {

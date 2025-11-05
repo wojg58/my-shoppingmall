@@ -532,7 +532,7 @@ export async function removeFromCart(
     }
 
     console.log("📊 삭제할 아이템 정보:", {
-      상품명: cartItem.products?.name || "알 수 없음",
+      상품명: (cartItem.products as { name: string }[])?.[0]?.name || "알 수 없음",
       수량: cartItem.quantity,
     });
 
@@ -556,7 +556,7 @@ export async function removeFromCart(
 
     console.log("✅ 삭제 완료:", {
       아이템ID: cartItemId,
-      상품명: cartItem.products?.name || "알 수 없음",
+      상품명: (cartItem.products as { name: string }[])?.[0]?.name || "알 수 없음",
     });
     console.groupEnd();
 
@@ -711,6 +711,76 @@ export async function getCartItems(): Promise<GetCartItemsResult> {
     return {
       success: false,
       error: "장바구니 조회 중 오류가 발생했습니다.",
+    };
+  }
+}
+
+/**
+ * 장바구니 전체 비우기
+ *
+ * 사용자의 모든 장바구니 아이템을 삭제합니다.
+ *
+ * @returns 성공/실패 결과
+ */
+export async function clearCart(): Promise<RemoveFromCartResult> {
+  console.group("🗑️ 장바구니 전체 비우기 시작");
+
+  try {
+    // 1. 인증 확인
+    const { userId } = await auth();
+    if (!userId) {
+      console.error("❌ 로그인하지 않은 사용자");
+      console.groupEnd();
+      return {
+        success: false,
+        error: "로그인이 필요합니다.",
+      };
+    }
+    console.log("✅ 사용자 인증 확인 완료:", userId);
+
+    // 2. Supabase 클라이언트 생성
+    const supabase = getServiceRoleClient();
+    console.log("✅ Supabase 클라이언트 생성 완료");
+
+    // 3. 사용자의 모든 장바구니 아이템 삭제
+    console.log("🗑️ 장바구니 아이템 삭제 중...");
+    const { error } = await supabase
+      .from("cart_items")
+      .delete()
+      .eq("clerk_id", userId); // 권한 검증
+
+    if (error) {
+      console.error("❌ 장바구니 비우기 실패:");
+      console.error("  - 에러 코드:", error.code);
+      console.error("  - 에러 메시지:", error.message);
+      console.groupEnd();
+      return {
+        success: false,
+        error: "장바구니를 비우는데 실패했습니다.",
+      };
+    }
+
+    console.log("✅ 장바구니 비우기 완료");
+    console.groupEnd();
+
+    revalidatePath("/cart");
+    revalidatePath("/");
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("❌ 예상치 못한 오류 발생:");
+    if (error instanceof Error) {
+      console.error("  - 에러 메시지:", error.message);
+      console.error("  - 스택 트레이스:", error.stack);
+    } else {
+      console.error("  - 에러 객체:", JSON.stringify(error, null, 2));
+    }
+    console.groupEnd();
+    return {
+      success: false,
+      error: "장바구니 비우기 중 오류가 발생했습니다.",
     };
   }
 }

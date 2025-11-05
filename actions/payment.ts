@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { createClerkSupabaseClient } from "@/lib/supabase/server";
 import { getServiceRoleClient } from "@/lib/supabase/service-role";
-import { getCartItems, clearCart } from "@/actions/cart";
+import { getCartItems, clearCart, type CartItem } from "@/actions/cart";
 import { z } from "zod";
 
 /**
@@ -140,17 +140,23 @@ async function confirmPaymentWithToss(
  * @returns 주문명
  */
 function generateOrderName(
-  items: Awaited<ReturnType<typeof getCartItems>>["data"],
+  items: CartItem[],
 ): string {
   if (items.length === 0) {
     return "주문";
   }
 
+  // products가 배열일 수 있으므로 안전하게 처리
+  const firstItem = items[0];
+  const productName = Array.isArray(firstItem.products)
+    ? firstItem.products[0]?.name || "상품"
+    : firstItem.products?.name || "상품";
+
   if (items.length === 1) {
-    return items[0].products.name;
+    return productName;
   }
 
-  return `${items[0].products.name} 외 ${items.length - 1}건`;
+  return `${productName} 외 ${items.length - 1}건`;
 }
 
 /**
@@ -248,9 +254,13 @@ export async function confirmPaymentAndCreateOrder(
     }
 
     // 5. 재고 및 품절 확인
-    const outOfStockItems = cartItems.filter(
-      (item) => item.products.stock_quantity === 0,
-    );
+    const outOfStockItems = cartItems.filter((item) => {
+      // products가 배열일 수 있으므로 안전하게 처리
+      const product = Array.isArray(item.products)
+        ? item.products[0]
+        : item.products;
+      return product?.stock_quantity === 0;
+    });
     if (outOfStockItems.length > 0) {
       console.error("❌ 품절 상품 포함");
       console.groupEnd();
@@ -328,13 +338,20 @@ export async function confirmPaymentAndCreateOrder(
 
     // 10. 주문 상품 저장 (order_items 테이블)
     console.log("📦 주문 상품 저장 중...");
-    const orderItems = cartItems.map((item) => ({
-      order_id: order.id,
-      product_id: item.product_id,
-      product_name: item.products.name,
-      quantity: item.quantity,
-      price: item.products.price,
-    }));
+    const orderItems = cartItems.map((item) => {
+      // products가 배열일 수 있으므로 안전하게 처리
+      const product = Array.isArray(item.products)
+        ? item.products[0]
+        : item.products;
+      
+      return {
+        order_id: order.id,
+        product_id: item.product_id,
+        product_name: product?.name || "상품",
+        quantity: item.quantity,
+        price: product?.price || 0,
+      };
+    });
 
     const { error: orderItemsError } = await supabase
       .from("order_items")

@@ -209,7 +209,7 @@ export function ShippingForm({
                       {...field}
                       disabled={isSubmitting}
                       onChange={(e) => {
-                        let value = e.target.value.replace(/[^0-9-]/g, "");
+                        const value = e.target.value.replace(/[^0-9-]/g, "");
 
                         // 하이픈 자동 추가 (선택사항)
                         // 사용자가 입력하는대로 두되, 검증은 Zod에서 처리

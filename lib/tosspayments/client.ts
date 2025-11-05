@@ -35,7 +35,7 @@ export async function loadTossPayments() {
     );
     console.log("✅ Toss Payments v1 SDK (npm 패키지) 로드 성공");
     return loadFromPackage;
-  } catch (error) {
+  } catch {
     console.log("⚠️ npm 패키지 로드 실패, 스크립트 태그 방식으로 폴백");
   }
 
