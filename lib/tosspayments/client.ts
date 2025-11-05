@@ -41,9 +41,9 @@ export async function loadTossPayments(): Promise<any> {
 
   // 스크립트 태그 방식 폴백
   // SDK가 이미 로드되어 있으면 반환
-  if (window.TossPayments) {
+  if ((window as any).TossPayments) {
     console.log("✅ Toss Payments v1 SDK (스크립트) 이미 로드됨");
-    return window.TossPayments;
+    return (window as any).TossPayments;
   }
 
   // SDK 스크립트가 이미 추가되어 있는지 확인
@@ -55,10 +55,10 @@ export async function loadTossPayments(): Promise<any> {
     // 스크립트가 로드될 때까지 대기
     return new Promise((resolve, reject) => {
       const checkInterval = setInterval(() => {
-        if (window.TossPayments) {
+        if ((window as any).TossPayments) {
           clearInterval(checkInterval);
           console.log("✅ Toss Payments v1 SDK (스크립트) 로드 완료");
-          resolve(window.TossPayments);
+          resolve((window as any).TossPayments);
         }
       }, 100);
 
@@ -76,9 +76,9 @@ export async function loadTossPayments(): Promise<any> {
     script.src = "https://js.tosspayments.com/v1/payment";
     script.async = true;
     script.onload = () => {
-      if (window.TossPayments) {
+      if ((window as any).TossPayments) {
         console.log("✅ Toss Payments v1 SDK (스크립트) 로드 완료");
-        resolve(window.TossPayments);
+        resolve((window as any).TossPayments);
       } else {
         reject(new Error("TossPayments v1 SDK 로드 실패"));
       }
@@ -137,11 +137,4 @@ export function createPaymentWidget(tossPayments: any, customerKey: string) {
 
   // TossPayments 인스턴스에서 결제위젯 생성
   return tossPayments;
-}
-
-// TypeScript 전역 타입 선언
-declare global {
-  interface Window {
-    TossPayments?: (clientKey: string) => Promise<any> | any;
-  }
 }
