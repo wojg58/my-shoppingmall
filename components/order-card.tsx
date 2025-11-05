@@ -2,7 +2,7 @@
 
 import { getOrderStatusLabel } from "@/constants/order-status";
 import { Calendar, Package } from "lucide-react";
-import * as React from "react";
+import { useState } from "react";
 import {
   Accordion,
   AccordionItem,
@@ -54,6 +54,9 @@ function formatPrice(price: number): string {
  * @param order 주문 정보
  */
 export function OrderCard({ order }: OrderCardProps) {
+  // 아코디언 열림/닫힘 상태 관리
+  const [openValue, setOpenValue] = useState<string | undefined>(undefined);
+
   // 주문 날짜 포맷팅
   const orderDate = new Date(order.created_at);
   const formattedDate = orderDate.toLocaleDateString("ko-KR", {
