@@ -77,7 +77,11 @@ export function OrderFormWrapper({
       // 주문 생성 Server Action 호출
       const result = await createOrder(data);
 
-      if (result.success) {
+      if (result.success === false) {
+        console.error("❌ 주문 생성 실패:", result.error);
+        console.groupEnd();
+        setError(result.error);
+      } else {
         console.log("✅ 주문 생성 성공:", {
           주문ID: result.data.orderId,
           총액: result.data.totalAmount,
@@ -86,10 +90,6 @@ export function OrderFormWrapper({
 
         // 주문 성공 페이지로 리다이렉트
         router.push(`/orders/${result.data.orderId}/success`);
-      } else {
-        console.error("❌ 주문 생성 실패:", result.error);
-        console.groupEnd();
-        setError(result.error);
       }
     } catch (err) {
       console.error("❌ 예상치 못한 오류 발생:", err);

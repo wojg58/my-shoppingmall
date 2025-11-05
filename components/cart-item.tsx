@@ -119,14 +119,14 @@ export function CartItemComponent({ item, onUpdate }: CartItemProps) {
 
     const result = await updateCartItemQuantity(item.id, newQuantity);
 
-    if (result.success) {
+    if (result.success === false) {
+      setError(result.error);
+      setQuantity(item.quantity); // 원래 수량으로 복원
+    } else {
       setQuantity(result.data.quantity);
       // GNB 장바구니 아이콘 갱신을 위한 이벤트 발생
       window.dispatchEvent(new Event("cart-updated"));
       onUpdate?.();
-    } else {
-      setError(result.error);
-      setQuantity(item.quantity); // 원래 수량으로 복원
     }
 
     setIsUpdating(false);
@@ -143,12 +143,12 @@ export function CartItemComponent({ item, onUpdate }: CartItemProps) {
 
     const result = await removeFromCart(item.id);
 
-    if (result.success) {
+    if (result.success === false) {
+      setError(result.error);
+    } else {
       // GNB 장바구니 아이콘 갱신을 위한 이벤트 발생
       window.dispatchEvent(new Event("cart-updated"));
       onUpdate?.();
-    } else {
-      setError(result.error);
     }
 
     setIsDeleting(false);

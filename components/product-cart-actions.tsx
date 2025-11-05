@@ -104,7 +104,11 @@ export function ProductCartActions({
     try {
       const result = await addToCart(productId, quantity);
 
-      if (result.success) {
+      if (result.success === false) {
+        console.error("❌ 장바구니 추가 실패:", result.error);
+        console.groupEnd();
+        setError(result.error);
+      } else {
         console.log("✅ 장바구니 추가 성공:", {
           아이템ID: result.data.id,
           수량: result.data.quantity,
@@ -116,10 +120,6 @@ export function ProductCartActions({
 
         // 다이얼로그 표시
         setShowDialog(true);
-      } else {
-        console.error("❌ 장바구니 추가 실패:", result.error);
-        console.groupEnd();
-        setError(result.error);
       }
     } catch (err) {
       console.error("❌ 예상치 못한 오류 발생:", err);

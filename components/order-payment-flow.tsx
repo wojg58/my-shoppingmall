@@ -82,7 +82,11 @@ export function OrderPaymentFlow({
     try {
       const result = await createOrder(data);
 
-      if (result.success) {
+      if (result.success === false) {
+        console.error("❌ 주문 생성 실패:", result.error);
+        console.groupEnd();
+        setError(result.error);
+      } else {
         console.log("✅ 주문 생성 성공:", {
           주문ID: result.data.orderId,
           총액: result.data.totalAmount,
@@ -91,10 +95,6 @@ export function OrderPaymentFlow({
 
         setOrderId(result.data.orderId);
         setStep("payment");
-      } else {
-        console.error("❌ 주문 생성 실패:", result.error);
-        console.groupEnd();
-        setError(result.error);
       }
     } catch (err) {
       console.error("❌ 예상치 못한 오류 발생:", err);
