@@ -102,7 +102,7 @@ async function OrderSuccessContent({ orderId }: { orderId: string }) {
     console.log("📦 주문 정보 조회 중...");
     const result = await getOrder(orderId);
 
-    if (!result.success) {
+    if (result.success === false) {
       console.error("❌ 주문 조회 실패:", result.error);
       console.groupEnd();
 

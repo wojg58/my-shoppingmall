@@ -85,7 +85,7 @@ async function CartContent() {
     console.log("📦 장바구니 아이템 조회 중...");
     const result = await getCartItems();
 
-    if (!result.success) {
+    if (result.success === false) {
       console.error("❌ 장바구니 조회 실패:", result.error);
       console.groupEnd();
       throw new Error(result.error);

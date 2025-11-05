@@ -149,7 +149,7 @@ function PaymentSuccessContent() {
           sessionStorage.removeItem(`checkout_${orderId}`);
         }
 
-        if (!result.success) {
+        if (result.success === false) {
           console.error("❌ 결제 승인 실패:", result.error);
           setError(result.error);
           setIsProcessing(false);

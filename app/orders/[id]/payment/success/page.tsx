@@ -96,7 +96,7 @@ function PaymentSuccessContent({
         console.log("📦 주문 정보 조회 중...");
         const orderResult = await getOrder(orderId);
 
-        if (!orderResult.success) {
+        if (orderResult.success === false) {
           console.error("❌ 주문 조회 실패:", orderResult.error);
           console.groupEnd();
           setError(orderResult.error || "주문 정보를 불러올 수 없습니다.");

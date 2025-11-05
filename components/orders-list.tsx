@@ -30,7 +30,7 @@ export async function OrdersList() {
   // 주문 목록 조회
   const result = await getOrders();
 
-  if (!result.success) {
+  if (result.success === false) {
     console.error("❌ 주문 목록 조회 실패:", result.error);
     console.groupEnd();
     return (

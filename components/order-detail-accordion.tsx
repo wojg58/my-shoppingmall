@@ -72,7 +72,7 @@ export function OrderDetailAccordion({
     try {
       const result = await getOrder(orderId);
 
-      if (!result.success) {
+      if (result.success === false) {
         console.error("❌ 주문 조회 실패:", result.error);
         setError(result.error);
         console.groupEnd();
@@ -113,7 +113,7 @@ export function OrderDetailAccordion({
     try {
       const result = await cancelOrder(orderId);
 
-      if (!result.success) {
+      if (result.success === false) {
         console.error("❌ 주문 취소 실패:", result.error);
         setError(result.error);
         console.groupEnd();
