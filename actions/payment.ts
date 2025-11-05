@@ -424,7 +424,7 @@ export async function confirmPaymentAndCreateOrder(
     console.log("🗑️ 장바구니 비우기 중...");
     const clearCartResult = await clearCart();
 
-    if (!clearCartResult.success) {
+    if (clearCartResult.success === false) {
       console.error("❌ 장바구니 비우기 실패:", clearCartResult.error);
       // 장바구니 비우기 실패해도 주문은 완료되었으므로 경고만 출력
     } else {
