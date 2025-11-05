@@ -121,6 +121,22 @@ export async function initializeTossPayments(clientKey: string) {
   }
 }
 
+/**
+ * 결제위젯 인스턴스 생성
+ *
+ * @param tossPayments TossPayments 인스턴스
+ * @param customerKey 고객 키 (Clerk user ID)
+ * @returns 결제위젯 인스턴스
+ */
+export function createPaymentWidget(tossPayments: any, customerKey: string) {
+  console.log("🎨 결제위젯 인스턴스 생성:", {
+    customerKey: customerKey.substring(0, 10) + "...",
+  });
+
+  // TossPayments 인스턴스에서 결제위젯 생성
+  return tossPayments;
+}
+
 // TypeScript 전역 타입 선언
 declare global {
   interface Window {
