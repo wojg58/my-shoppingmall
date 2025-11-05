@@ -22,7 +22,7 @@
  *
  * @returns loadTossPayments 함수 (클라이언트 키를 받아 초기화 함수 반환)
  */
-export async function loadTossPayments() {
+export async function loadTossPayments(): Promise<any> {
   // 브라우저 환경 확인
   if (typeof window === "undefined") {
     throw new Error("TossPayments는 브라우저 환경에서만 사용할 수 있습니다.");
@@ -108,7 +108,9 @@ export async function initializeTossPayments(clientKey: string) {
 
     // npm 패키지의 loadTossPayments는 Promise를 반환
     // 스크립트의 TossPayments는 직접 객체를 반환
-    const tossPayments = await loadTossPaymentsFn(clientKey);
+    const tossPayments = typeof loadTossPaymentsFn === 'function' 
+      ? await loadTossPaymentsFn(clientKey)
+      : loadTossPaymentsFn;
 
     console.log("✅ Toss Payments v1 결제창 초기화 완료");
     console.groupEnd();
